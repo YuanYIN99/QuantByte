@@ -5,13 +5,14 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, Lock, Unlock, BookOpen, Code, Lightbulb, TrendingUp } from 'lucide-react';
+import { ChevronLeft, Lock, Unlock, BookOpen, Code, Lightbulb, TrendingUp, MessageSquare, Send, X, Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { format, differenceInDays } from 'date-fns';
 import { cn } from './lib/utils';
 import contentData from './content.json';
+import { geminiService } from './services/geminiService';
 
 interface CourseEntry {
   id: number;
@@ -29,6 +30,19 @@ export default function App() {
   const [selectedLesson, setSelectedLesson] = useState<CourseEntry| null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [unlockedCount, setUnlockedCount] = useState(1);
+  
+  // Chatbot State
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([]);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const chatEndRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isAiLoading]);
 
   useEffect(() => {
     const savedDate = localStorage.getItem(START_DATE_KEY);
@@ -59,6 +73,30 @@ export default function App() {
   const goBack = () => {
     setActiveTab('grid');
     setSelectedLesson(null);
+    setIsChatOpen(false);
+    setMessages([]);
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || !selectedLesson || isAiLoading) return;
+
+    const userMessage = chatInput.trim();
+    setChatInput('');
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    setIsAiLoading(true);
+
+    try {
+      const response = await geminiService.askAboutLesson(
+        selectedLesson.title,
+        selectedLesson.concept,
+        userMessage
+      );
+      setMessages(prev => [...prev, { role: 'ai', content: response || "I'm not sure how to answer that." }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'ai', content: "Sorry, I had some trouble processing that request. Please try again." }]);
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   return (
@@ -234,6 +272,87 @@ export default function App() {
                     Complete Day {selectedLesson?.id}
                   </button>
                 </div>
+
+                {/* Chatbot Floating Button */}
+                <button 
+                  onClick={() => setIsChatOpen(true)}
+                  className="fixed bottom-28 right-8 w-14 h-14 bg-brand-blue text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-transform z-40"
+                >
+                  <MessageSquare size={24} />
+                </button>
+
+                {/* Chat Interface */}
+                <AnimatePresence>
+                  {isChatOpen && (
+                    <motion.div 
+                      key="ai-chat"
+                      initial={{ opacity: 0, y: 100, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 50, scale: 0.9 }}
+                      className="fixed bottom-6 right-6 left-6 md:left-auto md:w-[400px] h-[500px] bg-white rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] flex flex-col z-50 border border-slate-100 overflow-hidden"
+                    >
+                      <div className="bg-slate-900 p-6 flex justify-between items-center text-white">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-brand-blue flex items-center justify-center font-bold text-xs shadow-[0_0_10px_rgba(59,130,246,0.5)]">AI</div>
+                          <div>
+                            <h4 className="text-sm font-bold">Quant Assistant</h4>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Powered by Gemini</p>
+                          </div>
+                        </div>
+                        <button onClick={() => setIsChatOpen(false)} className="p-1 hover:bg-white/10 rounded-lg transition-colors">
+                          <X size={20} />
+                        </button>
+                      </div>
+
+                      <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
+                        {messages.length === 0 && (
+                          <div className="h-full flex flex-col items-center justify-center text-center px-6 text-slate-400 space-y-3">
+                            <MessageSquare size={32} strokeWidth={1.5} />
+                            <p className="text-sm">Confused about <b>{selectedLesson?.title}</b>? I'm here to help you master it.</p>
+                          </div>
+                        )}
+                        {messages.map((msg, i) => (
+                          <div key={i} className={cn("flex flex-col", msg.role === 'user' ? "items-end" : "items-start")}>
+                            <div className={cn(
+                              "max-w-[90%] px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm",
+                              msg.role === 'user' 
+                                ? "bg-brand-blue text-white rounded-br-none" 
+                                : "bg-slate-100 text-slate-800 rounded-bl-none border border-slate-100"
+                            )}>
+                              {msg.content}
+                            </div>
+                          </div>
+                        ))}
+                        {isAiLoading && (
+                          <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-widest ml-2">
+                            <Loader2 size={12} className="animate-spin text-brand-blue" />
+                            Analyzing...
+                          </div>
+                        )}
+                        <div ref={chatEndRef} />
+                      </div>
+
+                      <div className="p-4 border-t border-slate-50 bg-slate-50/50">
+                        <div className="flex gap-2">
+                          <input 
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                            placeholder="Ask a question..."
+                            className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/50 placeholder:text-slate-300 shadow-inner"
+                          />
+                          <button 
+                            onClick={handleSendMessage}
+                            disabled={!chatInput.trim() || isAiLoading}
+                            className="w-10 h-10 bg-brand-blue text-white rounded-xl flex items-center justify-center disabled:opacity-50 disabled:grayscale transition-all active:scale-90 shadow-lg shadow-brand-blue/20"
+                          >
+                            <Send size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </motion.div>
