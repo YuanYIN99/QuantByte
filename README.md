@@ -1,6 +1,6 @@
 # 📈 QuantByte: 365 Days of Mastery
 
-**QuantByte** is a structured, daily learning platform designed to take you from a complete finance beginner to an advanced Quantitative Analyst. Use the "1% Daily" philosophy to master complex concepts through bite-sized lessons, mathematical rigor, and real-world Python implementation.
+**QuantByte** (https://quant-byte-private.vercel.app/) is a structured, daily learning platform designed to take you from a complete finance beginner to an advanced Quantitative Analyst. Use the "1% Daily" philosophy to master complex concepts through bite-sized lessons, mathematical rigor, and real-world Python implementation.
 
 ---
 
