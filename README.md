@@ -1,20 +1,39 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 📈 QuantByte: 365 Days of Mastery
 
-# Run and deploy your AI Studio app
+**QuantByte** is a structured, daily learning platform designed to take you from a complete finance beginner to an advanced Quantitative Analyst. Use the "1% Daily" philosophy to master complex concepts through bite-sized lessons, mathematical rigor, and real-world Python implementation.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/dbb88c3e-5330-4972-8ca7-3d2ccfd0b466
+## 🚀 The Philosophy
+Modern finance can be overwhelming. **QuantByte** strips away the noise by delivering exactly one concept every 24 hours. You can't skip ahead, and you can't rush the process. True mastery is built through consistency.
 
-## Run Locally
+## 🛠 Features
+- 🔓 **Daily Unlock System**: Lessons unlock sequentially based on your start date (local persistence).
+- 🧠 **Multi-Modal Learning**: Each day includes:
+  - **The Concept**: Simplified, jargon-free explanation.
+  - **The Math Moment**: LaTeX-rendered formulas to build technical depth.
+  - **The Python Demo**: Ready-to-use code snippets for backtesting and analysis.
+- 🤖 **AI Quant Assistant**: An integrated Gemini-powered professor to answer specific questions about each lesson.
+- 🎨 **Clean Minimalism**: A high-end, editorial-grade interface designed for focused learning.
 
-**Prerequisites:**  Node.js
+## 📚 Curriculum Roadmap
+The course is designed as a logical progression:
+1.  **Days 1-30**: Financial Foundations (Stocks, Returns, TVM).
+2.  **Days 31-90**: Statistical Foundations & Portfolio Theory.
+3.  **Days 91-180**: Derivatives, Options, and the Greeks.
+4.  **Days 181-365**: Stochastic Calculus, Machine Learning, and HFT strategies.
 
+## 💻 Tech Stack
+- **Frontend**: React 19 + TypeScript + Vite
+- **Styling**: Tailwind CSS 4
+- **Animations**: Motion (formerly Framer Motion)
+- **AI**: Google Gemini API (@google/genai)
+- **Math Rendering**: KaTeX + React-Markdown
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+---
+
+## ⚡ Quick Start (Self-Hosting)
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/your-username/quantbyte.git
