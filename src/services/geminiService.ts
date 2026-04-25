@@ -23,5 +23,24 @@ export const geminiService = {
       console.error("Gemini API Error:", error);
       throw new Error("I'm sorry, I'm having trouble connecting to my brain right now. Please try again in a moment.");
     }
+  },
+  async getQuizFeedback(lessonBatch: string, question: string, userAnswer: string) {
+    try {
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `You are a helpful Quantitative Finance Professor. 
+        The student has just completed a batch of lessons covering: "${lessonBatch}".
+        
+        The quiz question was: "${question}"
+        The student's answer was: "${userAnswer}"
+        
+        Please grade the answer (tell them if they are right, partially right, or wrong) and provide a detailed explanation of the correct concept. Be encouraging and helpful.`,
+      });
+      
+      return response.text;
+    } catch (error) {
+      console.error("Gemini Quiz Error:", error);
+      throw new Error("I'm having trouble grading your answer. Let's just say you did great and keep going!");
+    }
   }
 };

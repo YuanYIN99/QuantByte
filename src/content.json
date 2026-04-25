@@ -28,5 +28,179 @@
     "math": "FV = PV \\times (1 + r)^n",
     "math_desc": "Future Value (FV) equals Present Value (PV) compounded at interest rate (r) over (n) time periods.",
     "code": "def future_value(pv, r, n):\n    # Basic compound interest formula\n    return pv * (1 + r)**n\n\ninitial_deposit = 1000\nrate = 0.07\nyears = 10\nprint(f'Final Amount after 10 years: ${future_value(initial_deposit, rate, years):.2f}')"
+  },
+  {
+    "id": 4,
+    "title": "Bonds & Fixed Income",
+    "concept": "A bond is a loan made by an investor to a borrower (typically a corporation or government). The borrower promises to pay back the principal at maturity plus regular interest payments known as coupons.",
+    "deep_dive": "Bonds are called 'Fixed Income' because the cash flows are theoretically fixed. However, their market price fluctuates inversely with interest rates: when market rates go up, existing bonds with lower coupons become less valuable and their prices fall.",
+    "scenario": "A city wants to build a new bridge and issues 10-year bonds at 4% interest. If you buy a $1,000 bond, the city pays you $40 every year for 10 years, and then gives you your $1,000 back. You are essentially the bank for the city.",
+    "math": "P = \\sum_{t=1}^{n} \\frac{C}{(1+r)^t} + \\frac{M}{(1+r)^n}",
+    "math_desc": "The price of a bond (P) is the present value of all future coupon payments (C) plus the present value of the face value (M).",
+    "code": "def bond_price(coupon, face_value, rate, n):\n    pv_coupons = sum([coupon / (1 + rate)**t for t in range(1, n + 1)])\n    pv_face = face_value / (1 + rate)**n\n    return pv_coupons + pv_face\n\nprint(f'Bond Price: ${bond_price(40, 1000, 0.05, 10):.2f}')"
+  },
+  {
+    "id": 5,
+    "title": "Compounding Frequency",
+    "concept": "Interest can be compounded annually, semi-annually, monthly, or even continuously. The more frequent the compounding, the higher the effective annual rate (EAR).",
+    "deep_dive": "Continuous compounding is a theoretical limit often used in derivative pricing (like Black-Scholes). It assumes interest is calculated and added back at every infinitesimal moment, leading to the mathematical constant 'e'.",
+    "scenario": "Two banks offer 5% interest. Bank A compounds annually, while Bank B compounds monthly. If you deposit $100, Bank A gives you $105 after a year. Bank B gives you $105.12. That extra 12 cents comes from earning interest on your interest every month.",
+    "math": "EAR = (1 + \\frac{r}{m})^m - 1",
+    "math_desc": "The Effective Annual Rate (EAR) accounts for the number of compounding periods (m) per year.",
+    "code": "import math\n\ndef effective_rate(nominal_r, m):\n    if m == float('inf'): # Continuous\n        return math.exp(nominal_r) - 1\n    return (1 + nominal_r / m)**m - 1\n\nprint(f'Monthly: {effective_rate(0.05, 12):.4%}')\nprint(f'Continuous: {effective_rate(0.05, float(\"inf\")):.4%}')"
+  },
+  {
+    "id": 6,
+    "title": "Probability & Expected Value",
+    "concept": "Probability measures the likelihood of an event. In finance, we use Expected Value (EV) to average the potential outcomes of an uncertain investment weighted by their probabilities.",
+    "deep_dive": "Quant finance is essentially the management of probability distributions. We don't know what will happen, but we can model the 'shape' of possible futures. Expected Value tells us the 'center' of that shape.",
+    "scenario": "An oil company is drilling a well. There is a 20% chance they find oil (worth $10M) and an 80% chance it's dry (worth $0). The 'Expected Value' is $2M. If the drilling costs $1.5M, the project has a positive 'Expected Profit' of $0.5M, even though they might lose everything on a single well.",
+    "math": "E(X) = \\sum x_i p_i",
+    "math_desc": "Expected Value E(X) is the sum of each outcome (x) multiplied by its probability (p).",
+    "code": "outcomes = [10000000, 0]\nprobs = [0.2, 0.8]\nev = sum(o * p for o, p in zip(outcomes, probs))\nprint(f'Expected Value: ${ev:,.2f}')"
+  },
+  {
+    "id": 7,
+    "type": "quiz",
+    "title": "Week 1 Review Quiz",
+    "concept": "Let's test your knowledge on the core foundations: Stocks, Risk & Return, Time Value, Bonds, and Probability.",
+    "batch_cover": "Lessons 1-6 (Stocks, Risk/Return, TVM, Bonds, Compounding, Probability)",
+    "quiz_question": "Explain how an increase in market interest rates affects the price of an existing 10-year government bond, and why."
+  },
+  {
+    "id": 8,
+    "title": "Volatility (Standard Deviation)",
+    "concept": "Volatility is the most common measure of risk in finance. It represents how much an asset's price 'swings' away from its average return over a period.",
+    "deep_dive": "Mathematically, we use Standard Deviation (σ). It is the square root of Variance. A 'high vol' asset like Bitcoin might have a σ of 80% per year, while a 'low vol' utility stock might be 15%. This determines the size of the 'bets' quants take.",
+    "scenario": "Two stocks both average 10% returns. Stock A returns [9%, 11%, 10%]. Stock B returns [-20%, 40%, 10%]. Both have the same average, but Stock B is much more volatile. If you need the money tomorrow, Stock B is much riskier because its price could be anywhere.",
+    "math": "\\sigma = \\sqrt{\\frac{\\sum(R_i - \\bar{R})^2}{N}}",
+    "math_desc": "Standard deviation (σ) is the average distance of each data point from the mean return (R-bar).",
+    "code": "import numpy as np\n\nreturns_a = [0.09, 0.11, 0.10]\nreturns_b = [-0.20, 0.40, 0.10]\n\nprint(f'Vol A: {np.std(returns_a):.2%}')\nprint(f'Vol B: {np.std(returns_b):.2%}')"
+  },
+  {
+    "id": 9,
+    "title": "The Normal Distribution",
+    "concept": "The Normal Distribution (or Bell Curve) assumes that most returns cluster around the mean, with extreme 'tail' events (crashes or booms) being very rare.",
+    "deep_dive": "In quant finance, we often assume returns are 'Normally Distributed' for simplicity, though real markets have 'Fat Tails' (extreme events happen more often than the bell curve suggests). This is the source of many financial crises.",
+    "scenario": "If market returns follow a normal distribution, you can expect the daily return to stay within 1 standard deviation of the mean about 68% of the time, and within 2 standard deviations 95% of the time. If a returns drops by 5 standard deviations (a '5-sigma' event), the model says it should only happen once every few thousand years.",
+    "math": "f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{1}{2}(\\frac{x-\\mu}{\\sigma})^2}",
+    "math_desc": "The Probability Density Function (PDF) of a normal distribution with mean (μ) and standard deviation (σ).",
+    "code": "import scipy.stats as stats\n\n# Probability of a return being < -2% \n# given mean 0.1% and vol 1% daily\nprob = stats.norm.cdf(-0.02, 0.001, 0.01)\nprint(f'Prob of crash: {prob:.4%}')"
+  },
+  {
+    "id": 10,
+    "title": "Correlation & Covariance",
+    "concept": "Correlation measures how two assets move together. It ranges from -1 (perfect opposites) to +1 (perfect synchronization).",
+    "deep_dive": "Covariance is the raw measure of joint variability, but it's hard to interpret. Correlation 'standardizes' covariance so we can compare the relationship between Gold and Stocks, or Oil and the Dollar, on the same scale.",
+    "scenario": "Think of an ice cream shop and an umbrella shop. On sunny days, ice cream sells well and umbrellas don't. On rainy days, it's vice versa. These assets are 'negatively correlated'. If you own both, your total income stays stable regardless of the weather.",
+    "math": "\\rho_{XY} = \\frac{Cov(X,Y)}{\\sigma_X \\sigma_Y}",
+    "math_desc": "Correlation (ρ) is the covariance of two assets divided by the product of their individual standard deviations.",
+    "code": "import numpy as np\n\nstock_a = [1, 2, 3, 4, 5]\nstock_b = [5, 4, 3, 2, 1] # Inverse\n\ncorr = np.corrcoef(stock_a, stock_b)[0, 1]\nprint(f'Correlation: {corr}')"
+  },
+  {
+    "id": 11,
+    "title": "Modern Portfolio Theory (MPT)",
+    "concept": "MPT states that it's possible to construct an 'Efficient Frontier' of portfolios that offer the maximum possible expected return for a given level of risk.",
+    "deep_dive": "Founded by Harry Markowitz in 1952, MPT proved that you can't look at an asset in isolation. Its risk only matters in how it contributes to the overall portfolio. By combining uncorrelated assets, you can actually lower your risk without lowering your expected return.",
+    "scenario": "You have a portfolio of 100% tech stocks. If the tech sector crashes, you lose everything. By moving 40% into bonds and gold (which don't crash when tech does), you might slightly reduce your top-end gain, but you vastly reduce your 'downside' risk.",
+    "math": "\\sigma_p^2 = w_A^2\\sigma_A^2 + w_B^2\\sigma_B^2 + 2w_Aw_B\\rho_{AB}\\sigma_A\\sigma_B",
+    "math_desc": "The variance of a 2-asset portfolio depends on the weights (w), individual volatilities (σ), and the correlation (ρ) between them.",
+    "code": "def port_vol(w1, w2, vol1, vol2, corr):\n    var = (w1*vol1)**2 + (w2*vol2)**2 + 2*w1*w2*vol1*vol2*corr\n    return var**0.5\n\n# 50/50 mix with zero correlation\nprint(f'Portfolio Vol: {port_vol(0.5, 0.5, 0.2, 0.2, 0):.2%}')"
+  },
+  {
+    "id": 12,
+    "title": "The Sharpe Ratio",
+    "concept": "The Sharpe Ratio measures the performance of an investment compared to a risk-free asset, after adjusting for its risk.",
+    "deep_dive": "It's the industry standard for judging if a trader is actually 'good' or just taking massive risks. A Sharpe ratio above 1.0 is considered good, above 2.0 is excellent, and above 3.0 is rare and legendary. It tells us how much 'excess return' we get per unit of 'volatility'.",
+    "scenario": "Investor A makes 20% but their account value swings wildly (vol = 30%). Investor B makes 12% but their account is very stable (vol = 5%). If the risk-free rate is 2%, Investor B actually has a much higher Sharpe Ratio (2.0 vs 0.6) and is considered the better quant.",
+    "math": "Sharpe = \\frac{R_p - R_f}{\\sigma_p}",
+    "math_desc": "The return of the portfolio (Rp) minus the risk-free rate (Rf), divided by the portfolio's standard deviation (σp).",
+    "code": "def sharpe_ratio(ret, vol, rf=0.02):\n    return (ret - rf) / vol\n\nprint(f'Sharpe Ratio High Risk: {sharpe_ratio(0.20, 0.30):.2f}')\nprint(f'Sharpe Ratio Low Risk: {sharpe_ratio(0.12, 0.05):.2f}')"
+  },
+  {
+    "id": 13,
+    "title": "Capital Asset Pricing Model (CAPM)",
+    "concept": "CAPM describes the relationship between systematic risk and expected return for assets, introduced by the concept of 'Beta'.",
+    "deep_dive": "Beta measures how sensitive an asset is to the overall market. A Beta of 1.0 means it moves exactly with the market. A Beta of 1.5 means it's 50% more volatile than the market. CAPM says that you should only be compensated for Beta, not for 'idiosyncratic' risks you could have diversified away.",
+    "scenario": "If the market goes up 10%, a stock with Beta=2.0 is expected to go up 20%. If the market goes down 10%, that stock is expected to crash 20%. High-beta stocks are 'aggressive', low-beta (< 1.0) are 'defensive'.",
+    "math": "E(R_i) = R_f + \\beta_i (E(R_m) - R_f)",
+    "math_desc": "Expected return of asset i equals risk-free rate plus Beta times the market risk premium (Rm - Rf).",
+    "code": "# Calculate expected return using CAPM\nrf = 0.03\nmkt_premium = 0.07\nbeta = 1.2\n\nexpected_return = rf + beta * mkt_premium\nprint(f'CAPM Expected Return: {expected_return:.2%}')"
+  },
+  {
+    "id": 14,
+    "type": "quiz",
+    "title": "Week 2 Review Quiz",
+    "concept": "Testing your handle on Risk measurement: Volatility, Normal Distribution, Sharpe Ratio, and CAPM Beta.",
+    "batch_cover": "Lessons 8-13 (Vol, Normal Dist, Correlation, MPT, Sharpe, CAPM)",
+    "quiz_question": "If Stock A has a Sharpe Ratio of 0.5 and Stock B has a Sharpe Ratio of 1.2, which stock is providing more reward for every unit of risk taken? Also, define what 'Beta' represents in the context of CAPM."
+  },
+  {
+    "id": 15,
+    "title": "Options: The Basics",
+    "concept": "Options are derivatives that give the holder the right, but not the obligation, to buy (Call) or sell (Put) an asset at a pre-set price.",
+    "deep_dive": "Options are the building blocks of weaponized finance. They offer 'leverage' and 'non-linear' returns. Buying a Call is a bet that the price will go up; buying a Put is a bet that the price will go down (or a hedge against it).",
+    "scenario": "You think Apple (currently $150) will go to $170. You could buy the stock, or you could buy a $155 'Call Option' for $2. If Apple hits $170, your option is worth $15. Your $2 investment turned into $15 (7.5x gain!), whereas the stock only gained 13.3%.",
+    "math": "C = \\max(S - K, 0)",
+    "math_desc": "The intrinsic value of a Call option is the current stock price (S) minus the strike price (K), with a minimum of zero.",
+    "code": "def call_payoff(s, k):\n    return max(s - k, 0)\n\nstrikes = [140, 150, 160]\nprice = 155\npayoffs = [call_payoff(price, k) for k in strikes]\nprint(f'Payoffs: {payoffs}')"
+  },
+  {
+    "id": 16,
+    "title": "Option Greeks: Delta",
+    "concept": "Delta measures how much an option's price changes for every $1 move in the underlying stock.",
+    "deep_dive": "Delta is often interpreted as the 'theoretical probability' that the option will finish in-the-money. A Delta of 0.5 means if the stock goes up $1, the option goes up $0.50. It also tells quants how many shares of stock they need to buy or sell to 'hedge' their option position.",
+    "scenario": "You own 10 Call options with a Delta of 0.6. Each contract covers 100 shares. To be 'neutral' (so you don't care if the stock moves slightly), you would need to sell 600 shares of the stock (10 * 100 * 0.6).",
+    "math": "\\Delta = \\frac{\\partial V}{\\partial S}",
+    "math_desc": "Delta (Δ) is the first derivative of the option price (V) with respect to the stock price (S).",
+    "code": "# Simple Delta approximation\ndef estimate_delta(p1, p2, s1, s2):\n    return (p2 - p1) / (s2 - s1)\n\nprint(f'Est Delta: {estimate_delta(5.0, 5.5, 100, 101):.2f}')"
+  },
+  {
+    "id": 17,
+    "title": "Option Greeks: Gamma",
+    "concept": "Gamma measures how much the Delta changes for every $1 move in the underlying stock.",
+    "deep_dive": "If Delta is 'speed', Gamma is 'acceleration'. High gamma means your risk exposure (Delta) changes rapidly. This is the quant's nightmare—it means you have to constantly adjust your hedge as the market moves.",
+    "scenario": "Imagine a car race. Delta is your current speed. Gamma is how hard you are flooring the gas pedal. As you approach the finish line (expiration), Gamma often explodes, making the car much harder to control.",
+    "math": "\\Gamma = \\frac{\\partial^2 V}{\\partial S^2}",
+    "math_desc": "Gamma (Γ) is the second derivative of the option price (V) with respect to the stock price (S).",
+    "code": "# Gamma represents the rate of change of Delta\ndef calc_gamma(d1, d2, s1, s2):\n    return (d2 - d1) / (s2 - s1)\n\nprint(f'Est Gamma: {calc_gamma(0.50, 0.55, 100, 101):.3f}')"
+  },
+  {
+    "id": 18,
+    "title": "Option Greeks: Theta (Time Decay)",
+    "concept": "Theta measures how much an option's value decreases every day as it gets closer to expiration.",
+    "deep_dive": "Options are 'wasting assets'. Every day that passes reduces the chance of a big move happening before the deadline. Time is the enemy of the option buyer and the friend of the option seller.",
+    "scenario": "You buy a Call option for $5.00 that expires in 30 days. If the stock doesn't move at all, your option might be worth $4.90 tomorrow, $4.80 the day after, and eventually $0.00 at expiration. That slow leak of value is Theta.",
+    "math": "\\Theta = - \\frac{\\partial V}{\\partial t}",
+    "math_desc": "Theta (Θ) is the derivative of the option value (V) with respect to time (t). It is usually negative.",
+    "code": "days = range(30, 0, -5)\n# Simple decay model: sqrt of time\nvalues = [5 * (d/30)**0.5 for d in days]\nfor d, v in zip(days, values):\n    print(f'Day {d}: ${v:.2f}')"
+  },
+  {
+    "id": 19,
+    "title": "Option Greeks: Vega",
+    "concept": "Vega measures an option's sensitivity to changes in Volatility.",
+    "deep_dive": "If the market suddenly gets 'scared' and expects larger price swings, option prices go up even if the stock price doesn't change. Buying options is a way of 'buying volatility' (being Long Vega).",
+    "scenario": "Before an earnings report, uncertainty is high, so 'Implied Volatility' (IV) is high. You buy a Call. After the report, the 'uncertainty' disappears (even if the news was good!). IV crashes, and your option value drops. This is the 'IV Crush'.",
+    "math": "\\nu = \\frac{\\partial V}{\\partial \\sigma}",
+    "math_desc": "Vega (ν, though often written as lowercase 'v') is the sensitivity to changes in the standard deviation (σ).",
+    "code": "# Option price vs Volatility\ndef vega_effect(base_p, vega, vol_change):\n    return base_p + (vega * vol_change * 100)\n\nprint(f'New Price: ${vega_effect(10.0, 0.25, 0.05):.2f}')"
+  },
+  {
+    "id": 20,
+    "title": "Put-Call Parity",
+    "concept": "Put-Call Parity defines the static relationship between the prices of European put and call options with the same strike and expiration.",
+    "deep_dive": "This is one of the most elegant laws in finance. It states that buying a stock and a put is equivalent to buying a call and holding cash. If this relationship breaks, quants jump in to perform 'Arbitrage' (risk-free profit) until the prices align again.",
+    "scenario": "If you see a Call priced at $10 and a Put at $2, but the math says the Put should be $3, you buy the cheap Put and sell the expensive Call to capture the difference. In modern markets, algos close these gaps in milliseconds.",
+    "math": "C - P = S - K e^{-rT}",
+    "math_desc": "Call price (C) minus Put price (P) equals Stock price (S) minus the present value of the Strike price (K).",
+    "code": "def check_parity(c, p, s, k, r, t):\n    import math\n    lhs = c - p\n    rhs = s - k * math.exp(-r * t)\n    return abs(lhs - rhs) < 0.01\n\nprint(f'In Parity: {check_parity(10, 5.2, 105, 100, 0.05, 0.5)}')"
+  },
+  {
+    "id": 21,
+    "type": "quiz",
+    "title": "Week 3 Review Quiz",
+    "concept": "Mastering the 'Greeks' and the building blocks of derivatives.",
+    "batch_cover": "Lessons 15-20 (Options, Greeks: Delta, Gamma, Theta, Vega, Put-Call Parity)",
+    "quiz_question": "A trader is 'Long Vega' but 'Short Theta'. Describe their financial position in plain English. What are they betting on, and what is their biggest risk?"
   }
 ]

@@ -16,13 +16,16 @@ import { geminiService } from './services/geminiService';
 
 interface CourseEntry {
   id: number;
+  type?: string;
   title: string;
   concept: string;
   deep_dive?: string;
   scenario?: string;
-  math: string;
-  math_desc: string;
-  code: string;
+  math?: string;
+  math_desc?: string;
+  code?: string;
+  batch_cover?: string;
+  quiz_question?: string;
 }
 
 const PROGRESS_KEY = 'quant_byte_current_progress';
@@ -38,6 +41,11 @@ export default function App() {
   const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const chatEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Quiz State
+  const [quizAnswer, setQuizAnswer] = useState('');
+  const [quizFeedback, setQuizFeedback] = useState('');
+  const [isQuizLoading, setIsQuizLoading] = useState(false);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -59,6 +67,8 @@ export default function App() {
     if (lesson.id <= unlockedCount) {
       setSelectedLesson(lesson);
       setActiveTab('lesson');
+      setQuizAnswer('');
+      setQuizFeedback('');
     }
   };
 
@@ -69,6 +79,24 @@ export default function App() {
       localStorage.setItem(PROGRESS_KEY, nextProgress.toString());
     }
     goBack();
+  };
+
+  const handleQuizSubmit = async () => {
+    if (!quizAnswer.trim() || !selectedLesson || isQuizLoading) return;
+    
+    setIsQuizLoading(true);
+    try {
+      const feedback = await geminiService.getQuizFeedback(
+        selectedLesson.batch_cover || '',
+        selectedLesson.quiz_question || '',
+        quizAnswer
+      );
+      setQuizFeedback(feedback);
+    } catch (error) {
+      setQuizFeedback("Something went wrong with the grading. Let's assume you're on the right track!");
+    } finally {
+      setIsQuizLoading(false);
+    }
   };
 
   const goBack = () => {
@@ -235,51 +263,100 @@ export default function App() {
                     </p>
                   </div>
 
-                  {selectedLesson?.deep_dive && (
-                    <div className="mb-10 bg-slate-50 p-6 rounded-3xl border border-slate-100 border-l-4 border-l-brand-blue">
-                      <p className="text-xs font-bold uppercase tracking-widest text-brand-blue mb-2">Deep Dive</p>
-                      <p className="text-sm text-slate-700 leading-relaxed font-medium">
-                        {selectedLesson.deep_dive}
-                      </p>
-                    </div>
-                  )}
-
-                  {selectedLesson?.scenario && (
-                    <div className="mb-10 bg-amber-50/50 p-6 rounded-3xl border border-amber-100 border-l-4 border-l-amber-400">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Lightbulb size={14} className="text-amber-600" />
-                        <p className="text-xs font-bold uppercase tracking-widest text-amber-700">Real-World Scenario</p>
+                  {selectedLesson?.type === 'quiz' ? (
+                    <div className="space-y-8 mb-12">
+                      <div className="bg-slate-900 text-white p-8 rounded-[2.5rem] shadow-2xl">
+                        <div className="flex items-center gap-3 mb-6">
+                          <BookOpen className="text-brand-blue" />
+                          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Knowledge Check</p>
+                        </div>
+                        <h3 className="text-2xl font-serif mb-6">{selectedLesson.quiz_question}</h3>
+                        
+                        <textarea 
+                          value={quizAnswer}
+                          onChange={(e) => setQuizAnswer(e.target.value)}
+                          placeholder="Type your explanation here..."
+                          className="w-full h-40 bg-slate-800 border-none rounded-2xl p-6 text-slate-100 placeholder:text-slate-500 focus:ring-2 focus:ring-brand-blue/50 mb-6 resize-none"
+                        />
+                        
+                        <button 
+                          onClick={handleQuizSubmit}
+                          disabled={!quizAnswer.trim() || isQuizLoading}
+                          className="w-full py-4 bg-brand-blue text-white rounded-xl font-bold uppercase tracking-widest hover:bg-blue-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-3"
+                        >
+                          {isQuizLoading ? <Loader2 className="animate-spin" /> : <Send size={18} />}
+                          Submit to Professor
+                        </button>
                       </div>
-                      <p className="text-sm text-slate-700 leading-relaxed italic">
-                        "{selectedLesson.scenario}"
-                      </p>
-                    </div>
-                  )}
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                    <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 flex flex-col justify-between">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">Math Moment</p>
-                      <div className="flex items-center justify-center p-6 bg-white rounded-2xl shadow-sm border border-slate-100 mb-6 min-h-[120px]">
-                        <div className="markdown-body text-2xl scale-110">
-                          <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                            {`$$${selectedLesson?.math}$$`}
-                          </ReactMarkdown>
+                      <AnimatePresence>
+                        {quizFeedback && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white border-2 border-brand-blue/20 p-8 rounded-[2.5rem] shadow-lg relative overflow-hidden"
+                          >
+                            <div className="absolute top-0 left-0 w-2 h-full bg-brand-blue"></div>
+                            <div className="flex items-center gap-3 mb-4">
+                              <div className="w-10 h-10 rounded-full bg-brand-blue flex items-center justify-center font-bold text-white shadow-lg">AI</div>
+                              <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Professor's Feedback</p>
+                            </div>
+                            <div className="markdown-body text-slate-700 prose prose-slate max-w-none">
+                              <ReactMarkdown>{quizFeedback}</ReactMarkdown>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <>
+                      {selectedLesson?.deep_dive && (
+                        <div className="mb-10 bg-slate-50 p-6 rounded-3xl border border-slate-100 border-l-4 border-l-brand-blue">
+                          <p className="text-xs font-bold uppercase tracking-widest text-brand-blue mb-2">Deep Dive</p>
+                          <p className="text-sm text-slate-700 leading-relaxed font-medium">
+                            {selectedLesson.deep_dive}
+                          </p>
+                        </div>
+                      )}
+
+                      {selectedLesson?.scenario && (
+                        <div className="mb-10 bg-amber-50/50 p-6 rounded-3xl border border-amber-100 border-l-4 border-l-amber-400">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Lightbulb size={14} className="text-amber-600" />
+                            <p className="text-xs font-bold uppercase tracking-widest text-amber-700">Real-World Scenario</p>
+                          </div>
+                          <p className="text-sm text-slate-700 leading-relaxed italic">
+                            "{selectedLesson.scenario}"
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                        <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 flex flex-col justify-between">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">Math Moment</p>
+                          <div className="flex items-center justify-center p-6 bg-white rounded-2xl shadow-sm border border-slate-100 mb-6 min-h-[120px]">
+                            <div className="markdown-body text-2xl scale-110">
+                              <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                                {`$$${selectedLesson?.math}$$`}
+                              </ReactMarkdown>
+                            </div>
+                          </div>
+                          <p className="text-xs text-slate-500 leading-relaxed text-center font-medium italic">
+                            {selectedLesson?.math_desc}
+                          </p>
+                        </div>
+
+                        <div className="bg-slate-900 rounded-3xl p-8 shadow-xl flex flex-col overflow-hidden">
+                          <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-6">Python Demo</p>
+                          <div className="font-mono text-sm leading-relaxed overflow-x-auto whitespace-pre pb-4 scrollbar-hide">
+                            <code className="text-slate-300">
+                              {selectedLesson?.code}
+                            </code>
+                          </div>
                         </div>
                       </div>
-                      <p className="text-xs text-slate-500 leading-relaxed text-center font-medium italic">
-                        {selectedLesson?.math_desc}
-                      </p>
-                    </div>
-
-                    <div className="bg-slate-900 rounded-3xl p-8 shadow-xl flex flex-col overflow-hidden">
-                      <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-6">Python Demo</p>
-                      <div className="font-mono text-sm leading-relaxed overflow-x-auto whitespace-pre pb-4 scrollbar-hide">
-                        <code className="text-slate-300">
-                          {selectedLesson?.code}
-                        </code>
-                      </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="px-8 md:px-16 py-8 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
