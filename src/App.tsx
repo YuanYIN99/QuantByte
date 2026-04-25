@@ -19,6 +19,7 @@ interface CourseEntry {
   title: string;
   concept: string;
   deep_dive?: string;
+  scenario?: string;
   math: string;
   math_desc: string;
   code: string;
@@ -239,6 +240,18 @@ export default function App() {
                       <p className="text-xs font-bold uppercase tracking-widest text-brand-blue mb-2">Deep Dive</p>
                       <p className="text-sm text-slate-700 leading-relaxed font-medium">
                         {selectedLesson.deep_dive}
+                      </p>
+                    </div>
+                  )}
+
+                  {selectedLesson?.scenario && (
+                    <div className="mb-10 bg-amber-50/50 p-6 rounded-3xl border border-amber-100 border-l-4 border-l-amber-400">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Lightbulb size={14} className="text-amber-600" />
+                        <p className="text-xs font-bold uppercase tracking-widest text-amber-700">Real-World Scenario</p>
+                      </div>
+                      <p className="text-sm text-slate-700 leading-relaxed italic">
+                        "{selectedLesson.scenario}"
                       </p>
                     </div>
                   )}
