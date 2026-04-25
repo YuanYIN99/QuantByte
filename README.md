@@ -1,8 +1,7 @@
 # QuantByte: 365-Day Quantitative Finance Curriculum
 
-QuantByte is a comprehensive, bite-sized learning platform designed to take you from a curious beginner to a quantitative finance expert in 365 days.
+QuantByte (https://quant-byte-private.vercel.app/) is a comprehensive, bite-sized learning platform designed to take you from a curious beginner to a quantitative finance expert in 365 days.
 
-![QuantByte Preview](https://images.unsplash.com/photo-1611974714024-4607a55266ee?auto=format&fit=crop&q=80&w=2000)
 
 ## 🚀 Features
 
