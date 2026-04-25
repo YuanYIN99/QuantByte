@@ -2,25 +2,28 @@
   {
     "id": 1,
     "title": "What is a Stock?",
-    "concept": "A stock represents fractional ownership in a corporation. When you buy a share, you are essentially buying a small piece of that company's future earnings and assets.",
+    "concept": "A stock represents fractional ownership in a corporation. When you buy a share, you are essentially buying a small piece of that company's future earnings and assets. Stocks allow businesses to raise capital to grow while giving investors a chance to share in that growth.",
+    "deep_dive": "Historically, ownership was recorded on physical paper certificates, but today it is purely digital. The stock market is essentially a giant auction house where owners (sellers) and potential owners (buyers) negotiate the 'fair value' based on expectations of future cash flows.",
     "math": "P_0 = \\sum_{t=1}^{\\infty} \\frac{D_t}{(1+r)^t}",
-    "math_desc": "The intrinsic value of a stock is the present value of all its future dividends.",
-    "code": "def calculate_dividend_yield(dividend, price):\n    return (dividend / price) * 100\n\nprint(f'Yield: {calculate_dividend_yield(2.5, 100)}%')"
+    "math_desc": "The intrinsic value of a stock is the sum of all future dividends, discounted back to their present value at rate 'r'.",
+    "code": "# Python simulation of a Dividend Discount Model (DDM)\ndef stock_price_model(div, growth, discount_rate):\n    # Gordon Growth Model: P = D1 / (k - g)\n    return div / (discount_rate - growth)\n\nfair_value = stock_price_model(2.5, 0.03, 0.08)\nprint(f'Estimated Fair Value: ${fair_value:.2f}')"
   },
   {
     "id": 2,
     "title": "Risk and Return",
-    "concept": "In finance, risk is the uncertainty that an investment's actual return will be different from the expected return. Generally, higher risk is associated with the potential for higher returns.",
+    "concept": "In finance, risk is the uncertainty that an investment's actual return will differ from the expected return. Generally, higher risk is associated with the potential for higher returns. This tradeoff is the bedrock of quantitative decision-making.",
+    "deep_dive": "We quantify 'Return' as the percentage change in value over time, while 'Risk' is typically measured by volatility (standard deviation). For example, a high-growth tech stock has a higher 'spread' of possible outcomes compared to a stable government bond, hence higher risk.",
     "math": "E(R_p) = \\sum_{i} w_i E(R_i)",
-    "math_desc": "The expected return of a portfolio is the weighted average of the expected returns of its individual assets.",
-    "code": "import numpy as np\n\nreturns = [0.05, 0.12, -0.02, 0.08]\nexpected_return = np.mean(returns)\nprint(f'Expected Return: {expected_return * 100}%')"
+    "math_desc": "The expected return of a portfolio is the weighted average of the expected returns of its individual assets, where 'w' is the allocation percentage.",
+    "code": "import numpy as np\n\n# Asset returns in different scenarios\nscenarios = np.array([-0.10, 0.05, 0.20])\nweights = np.array([0.2, 0.5, 0.3]) # Probabilities\n\nexpected_val = np.sum(scenarios * weights)\nprint(f'Scenario-Weighted Expected Return: {expected_val:.2%}')"
   },
   {
     "id": 3,
     "title": "Time Value of Money (TVM)",
-    "concept": "Money available now is worth more than the same amount in the future due to its potential earning capacity. This core principle underpins all of quantitative finance.",
+    "concept": "Money available now is worth more than the same amount in the future due to its potential earning capacity. This core principle underpins all of quantitative finance—from valuing derivatives to pricing residential mortgages.",
+    "deep_dive": "Think of the interest rate as the 'rental price' of money. If you lend $100 today, you lose the ability to buy goods or invest it elsewhere. You are compensated for this opportunity cost, as well as for the risk that inflation might erode the purchasing power of your money over time.",
     "math": "FV = PV \\times (1 + r)^n",
-    "math_desc": "Future Value (FV) equals Present Value (PV) compounded at rate (r) over (n) periods.",
-    "code": "def future_value(pv, r, n):\n    return pv * (1 + r)**n\n\nprint(f'FV: ${future_value(1000, 0.05, 5):.2f}')"
+    "math_desc": "Future Value (FV) equals Present Value (PV) compounded at interest rate (r) over (n) time periods.",
+    "code": "def future_value(pv, r, n):\n    # Basic compound interest formula\n    return pv * (1 + r)**n\n\ninitial_deposit = 1000\nrate = 0.07\nyears = 10\nprint(f'Final Amount after 10 years: ${future_value(initial_deposit, rate, years):.2f}')"
   }
 ]

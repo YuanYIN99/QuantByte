@@ -18,17 +18,17 @@ interface CourseEntry {
   id: number;
   title: string;
   concept: string;
+  deep_dive?: string;
   math: string;
   math_desc: string;
   code: string;
 }
 
-const START_DATE_KEY = 'quant_byte_start_date';
+const PROGRESS_KEY = 'quant_byte_current_progress';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'grid' | 'lesson'>('grid');
   const [selectedLesson, setSelectedLesson] = useState<CourseEntry| null>(null);
-  const [startDate, setStartDate] = useState<Date | null>(null);
   const [unlockedCount, setUnlockedCount] = useState(1);
   
   // Chatbot State
@@ -45,29 +45,29 @@ export default function App() {
   }, [messages, isAiLoading]);
 
   useEffect(() => {
-    const savedDate = localStorage.getItem(START_DATE_KEY);
-    if (!savedDate) {
-      const now = new Date();
-      localStorage.setItem(START_DATE_KEY, now.toISOString());
-      setStartDate(now);
+    const savedProgress = localStorage.getItem(PROGRESS_KEY);
+    if (savedProgress) {
+      setUnlockedCount(parseInt(savedProgress, 10));
     } else {
-      setStartDate(new Date(savedDate));
+      localStorage.setItem(PROGRESS_KEY, '1');
+      setUnlockedCount(1);
     }
   }, []);
-
-  useEffect(() => {
-    if (startDate) {
-      const daysSinceStart = differenceInDays(new Date(), startDate);
-      const currentUnlocked = Math.min(contentData.length, daysSinceStart + 1);
-      setUnlockedCount(currentUnlocked);
-    }
-  }, [startDate]);
 
   const handleLessonClick = (lesson: CourseEntry) => {
     if (lesson.id <= unlockedCount) {
       setSelectedLesson(lesson);
       setActiveTab('lesson');
     }
+  };
+
+  const completeLesson = () => {
+    if (selectedLesson && selectedLesson.id === unlockedCount) {
+      const nextProgress = unlockedCount + 1;
+      setUnlockedCount(nextProgress);
+      localStorage.setItem(PROGRESS_KEY, nextProgress.toString());
+    }
+    goBack();
   };
 
   const goBack = () => {
@@ -171,10 +171,10 @@ export default function App() {
               <footer className="mt-16 p-8 bg-slate-900 rounded-[2.5rem] flex items-center justify-between text-white shadow-2xl">
                 <div className="flex items-center gap-4">
                   <div className="w-3 h-3 bg-brand-blue rounded-full animate-pulse shadow-[0_0_15px_rgba(59,130,246,0.8)]"></div>
-                  <p className="text-sm font-medium">Daily unlock tracking active</p>
+                  <p className="text-sm font-medium">Progress Tracking Active</p>
                 </div>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
-                  Next lesson in {24 - (differenceInDays(new Date(), startDate || new Date()) % 24)}h
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest leading-loose">
+                  Complete your current lesson<br/>to unlock the next concept
                 </p>
               </footer>
             </div>
@@ -234,6 +234,15 @@ export default function App() {
                     </p>
                   </div>
 
+                  {selectedLesson?.deep_dive && (
+                    <div className="mb-10 bg-slate-50 p-6 rounded-3xl border border-slate-100 border-l-4 border-l-brand-blue">
+                      <p className="text-xs font-bold uppercase tracking-widest text-brand-blue mb-2">Deep Dive</p>
+                      <p className="text-sm text-slate-700 leading-relaxed font-medium">
+                        {selectedLesson.deep_dive}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                     <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 flex flex-col justify-between">
                       <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-6">Math Moment</p>
@@ -266,7 +275,7 @@ export default function App() {
                     <p className="text-sm text-slate-500 font-medium">Continuing Your Journey...</p>
                   </div>
                   <button 
-                    onClick={goBack}
+                    onClick={completeLesson}
                     className="px-10 py-4 bg-slate-950 text-white rounded-full font-bold text-sm tracking-widest uppercase hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/20 active:scale-95"
                   >
                     Complete Day {selectedLesson?.id}
