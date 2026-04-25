@@ -1,20 +1,19 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 📉 QuantByte: A 365-Day Mastery Path
 
-# Run and deploy your AI Studio app
+**QuantByte** is a production-grade educational platform designed to turn anyone into a quantitative finance professional, one byte at a time. This isn't just a reading list; it's an interactive, AI-guided academy.
 
-This contains everything you need to run your app locally.
+## 🚀 Features
 
-View your app in AI Studio: https://ai.studio/apps/dbb88c3e-5330-4972-8ca7-3d2ccfd0b466
+- **Sequential Learning Roadmap**: 365 curated lessons covering Stocks, Bonds, Portfolio Theory, the Black-Scholes model, and beyond.
+- **AI Professor Quizzes**: Weekly knowledge checks where an AI tutor analyzes your responses, provides personalized feedback, and ensures you've actually mastered the week's concepts.
+- **Zero-Latency Unlocking**: Move through the curriculum as fast as you can. Finish a day, unlock the next—no artificial time barriers.
+- **Quant Toolbelt**: Every lesson comes with professional-grade Python code examples and mathematical derivations rendered in LaTeX.
+- **On-Demand Assistance**: A floating AI chatbot powered by Gemini is integrated into every lesson to answer "Why?" and "How?" at any moment.
 
-## Run Locally
+## 🛠️ Built With
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **Framework**: React 18 & Vite
+- **AI**: Google Gemini Pro (Generative AI)
+- **Animation**: Motion (Framer Motion)
+- **Styling**: Tailwind CSS & Lucide Icons
+- **Math**: KaTeX & RemarkMath
