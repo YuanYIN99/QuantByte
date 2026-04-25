@@ -1,6 +1,6 @@
-# 📉 QuantByte: A 365-Day Mastery Path
+# 📉 QuantByte: A 365-Day Mastery Path towards Quantitative Finance
 
-**QuantByte** is a production-grade educational platform designed to turn anyone into a quantitative finance professional, one byte at a time. This isn't just a reading list; it's an interactive, AI-guided academy.
+**QuantByte** (https://quant-byte-private.vercel.app/) is a production-grade educational platform designed to turn anyone into a quantitative finance professional, one byte at a time. This isn't just a reading list; it's an interactive, AI-guided academy.
 
 ## 🚀 Features
 
