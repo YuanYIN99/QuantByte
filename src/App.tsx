@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, Lock, Unlock, BookOpen, Code, Lightbulb, TrendingUp, MessageSquare, Send, X, Loader2 } from 'lucide-react';
+import { ChevronLeft, Lock, Unlock, BookOpen, Code, Lightbulb, TrendingUp, MessageSquare, Send, X, Loader2, Smile } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
@@ -21,6 +21,7 @@ interface CourseEntry {
   concept: string;
   deep_dive?: string;
   scenario?: string;
+  meme?: string;
   math?: string;
   math_desc?: string;
   code?: string;
@@ -316,6 +317,20 @@ export default function App() {
                           <p className="text-sm text-slate-700 leading-relaxed font-medium">
                             {selectedLesson.deep_dive}
                           </p>
+                        </div>
+                      )}
+
+                      {selectedLesson?.meme && (
+                        <div className="mb-10 bg-indigo-50/50 p-6 rounded-3xl border border-indigo-100 flex items-start gap-4">
+                          <div className="bg-indigo-100 p-3 rounded-2xl text-indigo-600">
+                            <Smile size={20} />
+                          </div>
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-widest text-indigo-700 mb-1">Quant Meme of the Day</p>
+                            <p className="text-sm text-slate-700 leading-relaxed font-medium italic">
+                              {selectedLesson.meme}
+                            </p>
+                          </div>
                         </div>
                       )}
 
